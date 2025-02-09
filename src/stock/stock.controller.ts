@@ -17,9 +17,19 @@ export class StockController {
     return this.stockService.findAll();
   }
 
+  @Get('name/:name')
+  findBySymbol(@Param('name') name: string) {
+    return this.stockService.findBySymbol(name);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.stockService.findOne(+id);
+  }
+
+  @Get('year/:year')
+  findByYear(@Param('year') year: string) {
+    return this.stockService.findByYear(+year);
   }
 
   @Patch(':id')

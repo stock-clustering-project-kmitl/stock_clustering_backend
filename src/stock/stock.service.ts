@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class StockService {
@@ -14,6 +16,32 @@ export class StockService {
 
   findOne(id: number) {
     return `This action returns a #${id} stock`;
+  }
+
+  findBySymbol(symbol: string) {
+    const filePath = path.join(__dirname, '../../../DATASET/RawData', `2020.json`);
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf8');
+      const stocks = JSON.parse(data);
+      const stock = stocks.find((stock: any) => stock.symbol === symbol);
+      if (stock) {
+        return stock;
+      } else {
+        throw new Error(`Stock with symbol ${symbol} not found`);
+      }
+    } else {
+      throw new Error(`Stock data not found`);
+    }
+  }
+
+  findByYear(year: number) {
+    const filePath = path.join(__dirname, '../../../DATASET/RawData', `${year}.json`);
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf8');
+      return JSON.parse(data);
+    } else {
+      throw new Error(`Data for year ${year} not found`);
+    }
   }
 
   update(id: number, updateStockDto: UpdateStockDto) {
