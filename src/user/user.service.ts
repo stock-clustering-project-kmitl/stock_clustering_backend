@@ -1,12 +1,14 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schema/user.chema';
 import { FilterQuery, Model } from 'mongoose';
-import { hash } from 'bcryptjs';
+import { hash, compare } from 'bcryptjs';
 import { Types } from 'mongoose';
 import { StockService } from '../stock/stock.service';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 
 @Injectable()
 export class UserService {
@@ -119,5 +121,38 @@ export class UserService {
       limit,
       favoriteStocks,
     };
+  }
+
+  async updateUserProfile(userId: string, updateUserProfileDto: UpdateUserProfileDto) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (updateUserProfileDto.username) {
+      user.username = updateUserProfileDto.username;
+    }
+    if (updateUserProfileDto.email) {
+      user.email = updateUserProfileDto.email;
+    }
+
+    await user.save();
+    return user;
+  }
+
+  async updateUserPassword(userId: string, updateUserPasswordDto: UpdateUserPasswordDto) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const authenticated = await compare(updateUserPasswordDto.currentPassword, user.password);
+    if (!authenticated) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    user.password = await hash(updateUserPasswordDto.newPassword, 10);
+    await user.save();
+    return user;
   }
 }

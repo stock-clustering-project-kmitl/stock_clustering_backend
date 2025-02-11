@@ -5,6 +5,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { User } from './schema/user.chema';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 
 @Controller('user')
 export class UserController {
@@ -57,5 +59,17 @@ export class UserController {
     const sortField = sortBy || 'name'; // default sort field
     const sortDirection = sortOrder || 'asc'; // default sort order
     return this.userService.getFavoriteStocks(user._id.toString(), pageNumber, limitNumber, sortField, sortDirection);
+  }
+
+  @Patch('/update-profile')
+  @UseGuards(JwtAuthGuard)
+  async updateProfile(@CurrentUser() user: User, @Body() updateUserProfileDto: UpdateUserProfileDto) {
+    return this.userService.updateUserProfile(user._id.toString(), updateUserProfileDto);
+  }
+
+  @Patch('/update-password')
+  @UseGuards(JwtAuthGuard)
+  async updatePassword(@CurrentUser() user: User, @Body() updateUserPasswordDto: UpdateUserPasswordDto) {
+    return this.userService.updateUserPassword(user._id.toString(), updateUserPasswordDto);
   }
 }

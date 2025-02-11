@@ -10,6 +10,7 @@ export class User{
     username: string;
 
     @Prop({ unique: true })
+    //should check if its a valid email
     email: string;
 
     @Prop()
