@@ -175,20 +175,45 @@ export class UserService {
     return user.lastStockSearch;
   }
 
-  async addClusterParameter(userId: string, parameter: object) {
+  async addClusterParameter(userId: string, algorithm: string, parameter: object) {
     const user = await this.userModel.findById(userId);
     if (!user) {
-      throw new NotFoundException('User not found');
+        throw new NotFoundException('User not found');
     }
-  
-    user.lastClusterParameterUsed = user.lastClusterParameterUsed.filter(param => JSON.stringify(param) !== JSON.stringify(parameter));
-  
-    user.lastClusterParameterUsed.unshift(parameter);
-  
-    if (user.lastClusterParameterUsed.length > 5) {
-      user.lastClusterParameterUsed.pop();
+
+    // Initialize lastClusterParameterUsed if it doesn't exist
+    if (!user.lastClusterParameterUsed) {
+        user.lastClusterParameterUsed = new Map();
     }
-  
+
+    // Initialize the algorithm array if it doesn't exist
+    if (!user.lastClusterParameterUsed.has(algorithm)) {
+        user.lastClusterParameterUsed.set(algorithm, []);
+    }
+
+    // Get the parameters array for the algorithm
+    const parameters = user.lastClusterParameterUsed.get(algorithm);
+
+    // Filter out the existing parameter if it exists
+    const filteredParameters = parameters.filter(param => JSON.stringify(param) !== JSON.stringify(parameter));
+
+    // Add the new parameter to the beginning of the array
+    filteredParameters.unshift(parameter);
+
+    // Ensure only the last 5 parameters are kept
+    if (filteredParameters.length > 5) {
+        filteredParameters.pop();
+    }
+
+    // Update the map with the new parameters array
+    user.lastClusterParameterUsed.set(algorithm, filteredParameters);
+
+    // Ensure only the last 5 algorithms are kept
+    if (user.lastClusterParameterUsed.size > 5) {
+        const firstKey = user.lastClusterParameterUsed.keys().next().value;
+        user.lastClusterParameterUsed.delete(firstKey);
+    }
+
     await user.save();
     return user.lastClusterParameterUsed;
   }

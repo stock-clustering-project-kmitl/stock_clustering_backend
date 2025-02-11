@@ -27,8 +27,8 @@ export class User{
     @Prop({ type: [String] })
     lastStockSearch: string[];
 
-    @Prop({ type: [{ type: Object }] })
-    lastClusterParameterUsed: object[];
+    @Prop({ type: Map, of: [{ type: Object }] })
+    lastClusterParameterUsed: Map<string, object[]>;
 
 }  
 
