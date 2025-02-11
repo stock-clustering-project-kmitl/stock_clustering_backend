@@ -6,10 +6,6 @@ export class CreateBookmarkDto {
   @IsString()
   algorithmName: string;
 
-  @IsNotEmpty()
-  @IsString()
-  bookmarkName: string;
-
   @IsObject()
   parameterPreset: Record<string, any>;
 

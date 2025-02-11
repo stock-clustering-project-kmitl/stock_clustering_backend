@@ -42,4 +42,16 @@ export class UserService {
     user.bookmarks.push(bookmarkId);
     await user.save();
   }
+
+  async addBookmarkToUser(userId: string, bookmarkId: Types.ObjectId): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, {
+      $push: { bookmarks: bookmarkId },
+    });
+  }
+
+  async removeBookmarkFromUser(userId: string, bookmarkId: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, {
+      $pull: { bookmarks: bookmarkId },
+    });
+  }
 }

@@ -75,16 +75,21 @@ def convert_to_serializable(value):
             return value.tolist()  # Convert NumPy arrays to lists
         return value  # Return the value as is if it's already serializable
 
+# Load cluster parameters
+cluster_params = load_json('../cluster_backend/shared/constants/cluster_parameter.json')
+
 # Route to handle clustering requests
 @app.route('/cluster', methods=['POST'])
 def cluster_stocks():
     data = request.json
     year = data.get('year')
     algorithm = data.get('algorithm')
-    params = data.get('params', {})
+    use_best_params = data.get('use_best_params', False)
+    params = cluster_params[algorithm] if use_best_params else data.get('params', {})
     reduce_method = data.get('reduce_method', 'none')  # 'pca', 'tsne', or 'none'
     n_components = data.get('n_components', 2)  # Number of components for reduction
 
+    print(params) 
     # Load stock data
     stock_data = load_json(data['file_path'])
     df, X = preprocess_data(stock_data, year)
@@ -147,7 +152,8 @@ def nearest_stocks():
     stock_name = data.get('stock_name')
     year = data.get('year')
     algorithm = data.get('algorithm')
-    params = data.get('params', {})
+    use_best_params = data.get('use_best_params', False)
+    params = cluster_params[algorithm] if use_best_params else data.get('params', {})
     number_of_stock = data.get('number_of_stock', 1)  # Number of nearest stocks to return
     
     # Load stock data
@@ -207,3 +213,4 @@ def nearest_stocks():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+b

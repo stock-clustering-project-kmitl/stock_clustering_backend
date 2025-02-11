@@ -15,4 +15,10 @@ describe('StockService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('should return stock data for a given year', () => {
+    const year = 2020;
+    const result = { /* mock data */ };
+    expect(service.findByYear(year)).toEqual(result);
+  });
 });
