@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, InternalServerErrorException, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -19,5 +19,43 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   async getUsers(@CurrentUser() user:User){
     return this.userService.getUsers()
+  }
+
+  @Patch('/add-favorite-stock')
+  @UseGuards(JwtAuthGuard)
+  async addFavoriteStock(@CurrentUser() user: User, @Body('stockName') stockName: string) {
+    try {
+      return await this.userService.addFavoriteStock(user._id.toString(), stockName);
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Failed to add favorite stock');
+    }
+  }
+
+  @Patch('/remove-favorite-stock')
+  @UseGuards(JwtAuthGuard)
+  async removeFavoriteStock(@CurrentUser() user: User, @Body('stockName') stockName: string) {
+    try {
+      return await this.userService.removeFavoriteStock(user._id.toString(), stockName);
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Failed to remove favorite stock');
+    }
+  }
+
+  @Get('/favorite-stocks')
+  @UseGuards(JwtAuthGuard)
+  async getFavoriteStocks(
+    @CurrentUser() user: User,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('sortBy') sortBy: string,
+    @Query('sortOrder') sortOrder: 'asc' | 'desc'
+  ) {
+    const pageNumber = parseInt(page, 10) || 1;
+    const limitNumber = parseInt(limit, 10) || 10;
+    const sortField = sortBy || 'name'; // default sort field
+    const sortDirection = sortOrder || 'asc'; // default sort order
+    return this.userService.getFavoriteStocks(user._id.toString(), pageNumber, limitNumber, sortField, sortDirection);
   }
 }

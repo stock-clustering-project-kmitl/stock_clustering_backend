@@ -17,4 +17,38 @@ describe('UserController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
+
+  it('should return paginated favorite stocks', async () => {
+    const userId = 'someUserId';
+    const page = '1';
+    const limit = '10';
+    const result = {
+      total: 20,
+      page: 1,
+      limit: 10,
+      favoriteStocks: [ /* mock favorite stocks */ ],
+    };
+
+    jest.spyOn(service, 'getFavoriteStocks').mockImplementation(async () => result);
+
+    expect(await controller.getFavoriteStocks({ _id: userId } as any, page, limit)).toBe(result);
+  });
+
+  it('should return sorted paginated favorite stocks', async () => {
+    const userId = 'someUserId';
+    const page = '1';
+    const limit = '10';
+    const sortBy = 'price';
+    const sortOrder = 'asc';
+    const result = {
+      total: 20,
+      page: 1,
+      limit: 10,
+      favoriteStocks: [ /* mock favorite stocks */ ],
+    };
+
+    jest.spyOn(service, 'getFavoriteStocks').mockImplementation(async () => result);
+
+    expect(await controller.getFavoriteStocks({ _id: userId } as any, page, limit, sortBy, sortOrder)).toBe(result);
+  });
 });

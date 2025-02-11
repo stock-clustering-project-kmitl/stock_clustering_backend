@@ -27,4 +27,21 @@ describe('StockController', () => {
 
     expect(controller.findByYear(year)).toBe(result);
   });
+
+  it('should return stock names for a given prefix', () => {
+    const prefix = 'A';
+    const result = [ /* mock stock names */ ];
+    jest.spyOn(service, 'searchByPrefix').mockImplementation(() => result);
+
+    expect(controller.searchByPrefix(prefix)).toBe(result);
+  });
+
+  it('should return limited stock names for a given prefix', () => {
+    const prefix = 'A';
+    const limit = '5';
+    const result = [ /* mock stock names */ ];
+    jest.spyOn(service, 'searchByPrefix').mockImplementation(() => result.slice(0, parseInt(limit, 10)));
+
+    expect(controller.searchByPrefix(prefix, limit)).toBe(result.slice(0, parseInt(limit, 10)));
+  });
 });

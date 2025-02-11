@@ -21,4 +21,17 @@ describe('StockService', () => {
     const result = { /* mock data */ };
     expect(service.findByYear(year)).toEqual(result);
   });
+
+  it('should return stock names for a given prefix', () => {
+    const prefix = 'A';
+    const result = [ /* mock stock names */ ];
+    expect(service.searchByPrefix(prefix)).toEqual(result);
+  });
+
+  it('should return limited stock names for a given prefix', () => {
+    const prefix = 'A';
+    const limit = 5;
+    const result = [ /* mock stock names */ ];
+    expect(service.searchByPrefix(prefix, limit)).toEqual(result.slice(0, limit));
+  });
 });

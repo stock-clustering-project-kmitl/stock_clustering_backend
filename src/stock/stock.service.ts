@@ -44,6 +44,23 @@ export class StockService {
     }
   }
 
+  searchByPrefix(prefix: string, limit?: number) {
+    const filePath = path.join(__dirname, '../../../DATASET/RawData', `2020.json`);
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf8');
+      const stocks = JSON.parse(data);
+      let filteredStocks = stocks
+        .filter((stock: any) => stock.symbol.startsWith(prefix))
+        .map((stock: any) => stock.symbol);
+      if (limit) {
+        filteredStocks = filteredStocks.slice(0, limit);
+      }
+      return filteredStocks;
+    } else {
+      throw new Error(`Stock data not found`);
+    }
+  }
+
   update(id: number, updateStockDto: UpdateStockDto) {
     return `This action updates a #${id} stock`;
   }

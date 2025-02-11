@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,12 +6,14 @@ import { User } from './schema/user.chema';
 import { FilterQuery, Model } from 'mongoose';
 import { hash } from 'bcryptjs';
 import { Types } from 'mongoose';
+import { StockService } from '../stock/stock.service';
 
 @Injectable()
 export class UserService {
 
   constructor(
-    @InjectModel(User.name) private readonly userModel : Model<User>
+    @InjectModel(User.name) private readonly userModel : Model<User>,
+    private readonly stockService: StockService
   ) {}
 
   async create(data: CreateUserDto) {
@@ -53,5 +55,69 @@ export class UserService {
     await this.userModel.findByIdAndUpdate(userId, {
       $pull: { bookmarks: bookmarkId },
     });
+  }
+
+  async addFavoriteStock(userId: string, stockName: string) {
+    try {
+      const user = await this.userModel.findById(userId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      if (user.favorite.includes(stockName)) {
+        throw new Error('Stock is already in favorites');
+      }
+
+      user.favorite.push(stockName);
+      await user.save();
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Failed to add favorite stock');
+    }
+  }
+
+  async removeFavoriteStock(userId: string, stockName: string) {
+    try {
+      const user = await this.userModel.findById(userId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      user.favorite = user.favorite.filter(stock => stock !== stockName);
+      await user.save();
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Failed to remove favorite stock');
+    }
+  }
+
+  async getFavoriteStocks(userId: string, page: number, limit: number, sortBy: string, sortOrder: 'asc' | 'desc') {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const favoriteStockNames = user.favorite.slice(startIndex, endIndex);
+    const favoriteStocks = await Promise.all(
+      favoriteStockNames.map(stockName => this.stockService.findBySymbol(stockName))
+    );
+
+    favoriteStocks.sort((a, b) => {
+      if (sortOrder === 'asc') {
+        return a[sortBy] > b[sortBy] ? 1 : -1;
+      } else {
+        return a[sortBy] < b[sortBy] ? 1 : -1;
+      }
+    });
+
+    return {
+      total: user.favorite.length,
+      page,
+      limit,
+      favoriteStocks,
+    };
   }
 }
