@@ -10,7 +10,6 @@ export class User{
     username: string;
 
     @Prop({ unique: true })
-    //should check if its a valid email
     email: string;
 
     @Prop()
@@ -24,6 +23,12 @@ export class User{
         set: (favorites: string[]) => Array.from(new Set(favorites)), 
     })
     favorite: string[];
+
+    @Prop({ type: [String] })
+    lastStockSearch: string[];
+
+    @Prop({ type: [{ type: Object }] })
+    lastClusterParameterUsed: object[];
 
 }  
 

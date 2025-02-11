@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, UnauthorizedException, Inject, forwardRef } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from './schema/user.chema';
+import { User } from './schema/user.schema';
 import { FilterQuery, Model } from 'mongoose';
 import { hash, compare } from 'bcryptjs';
 import { Types } from 'mongoose';
@@ -15,7 +15,8 @@ export class UserService {
 
   constructor(
     @InjectModel(User.name) private readonly userModel : Model<User>,
-    private readonly stockService: StockService
+    @Inject(forwardRef(() => StockService))
+    private readonly stockService: StockService,
   ) {}
 
   async create(data: CreateUserDto) {
@@ -104,7 +105,7 @@ export class UserService {
 
     const favoriteStockNames = user.favorite.slice(startIndex, endIndex);
     const favoriteStocks = await Promise.all(
-      favoriteStockNames.map(stockName => this.stockService.findBySymbol(stockName))
+      favoriteStockNames.map(stockName => this.stockService.findBySymbol(stockName, userId))
     );
 
     favoriteStocks.sort((a, b) => {
@@ -154,5 +155,41 @@ export class UserService {
     user.password = await hash(updateUserPasswordDto.newPassword, 10);
     await user.save();
     return user;
+  }
+
+  async addStockToLastSearch(userId: string, stockName: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+  
+    user.lastStockSearch = user.lastStockSearch.filter(stock => stock !== stockName);
+  
+    user.lastStockSearch.unshift(stockName);
+  
+    if (user.lastStockSearch.length > 5) {
+      user.lastStockSearch.pop();
+    }
+  
+    await user.save();
+    return user.lastStockSearch;
+  }
+
+  async addClusterParameter(userId: string, parameter: object) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+  
+    user.lastClusterParameterUsed = user.lastClusterParameterUsed.filter(param => JSON.stringify(param) !== JSON.stringify(parameter));
+  
+    user.lastClusterParameterUsed.unshift(parameter);
+  
+    if (user.lastClusterParameterUsed.length > 5) {
+      user.lastClusterParameterUsed.pop();
+    }
+  
+    await user.save();
+    return user.lastClusterParameterUsed;
   }
 }

@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
-import { User } from './schema/user.chema';
+import { User } from './schema/user.schema';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 

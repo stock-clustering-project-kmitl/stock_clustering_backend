@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Bookmark } from './schema/bookmarkschema';
 import { Model } from 'mongoose';
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
-import { User } from 'src/user/schema/user.chema';
+import { User } from 'src/user/schema/user.schema';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()

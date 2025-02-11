@@ -1,11 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException ,Inject,forwardRef} from '@nestjs/common';
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
 import * as fs from 'fs';
 import * as path from 'path';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class StockService {
+
+  constructor(
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
+  ) {}
+
   create(createStockDto: CreateStockDto) {
     return 'This action adds a new stock';
   }
@@ -18,19 +25,20 @@ export class StockService {
     return `This action returns a #${id} stock`;
   }
 
-  findBySymbol(symbol: string) {
+  async findBySymbol(symbol: string, userId: string) {
     const filePath = path.join(__dirname, '../../../DATASET/RawData', `2020.json`);
     if (fs.existsSync(filePath)) {
       const data = fs.readFileSync(filePath, 'utf8');
       const stocks = JSON.parse(data);
       const stock = stocks.find((stock: any) => stock.symbol === symbol);
       if (stock) {
+        await this.userService.addStockToLastSearch(userId, symbol);
         return stock;
       } else {
-        throw new Error(`Stock with symbol ${symbol} not found`);
+        throw new NotFoundException(`Stock with symbol ${symbol} not found`);
       }
     } else {
-      throw new Error(`Stock data not found`);
+      throw new NotFoundException(`Stock data not found`);
     }
   }
 

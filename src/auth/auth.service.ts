@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcryptjs'
 import { Response } from 'express';
-import { User } from 'src/user/schema/user.chema';
+import { User } from 'src/user/schema/user.schema';
 import { UserService } from 'src/user/user.service';
 import { TokenPayload } from './token-payload-interface';
 

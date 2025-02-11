@@ -3,7 +3,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
-import { User } from 'src/user/schema/user.chema';
+import { User } from 'src/user/schema/user.schema';
 
 @Controller('bookmark')
 export class BookmarkController {

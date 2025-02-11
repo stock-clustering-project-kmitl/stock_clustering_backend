@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { SchemaTypes, Types } from "mongoose";
 import mongoose from 'mongoose';
-import { User } from "src/user/schema/user.chema";
+import { User } from "src/user/schema/user.schema";
 
 @Schema()
 export class Bookmark{
