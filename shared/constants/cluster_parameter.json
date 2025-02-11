@@ -1,4 +1,5 @@
 {
+  "silhouette": {
     "kmeans": {
       "n_clusters": 2,
       "init": "k-means++",
@@ -32,7 +33,118 @@
       "n_components": 2,
       "covariance_type": "full",
       "max_iter": 100,
-      "tol": 1e-3
+      "tol": 0.001
+    }
+  },
+  "davi": {
+    "kmeans": {
+      "n_clusters": 2,
+      "init": "k-means++",
+      "n_init": "auto",
+      "max_iter": 300,
+      "tol": 0.0001
+    },
+    "dbscan": {
+      "eps": 0.5,
+      "min_samples": 5
+    },
+    "affinity_propagation": {
+      "damping": 0.5,
+      "preference": 0.0,
+      "convergence_iter": 15
+    },
+    "hdbscan": {
+      "min_cluster_size": 5,
+      "min_samples": 5
+    },
+    "meanshift": {
+      "bandwidth": 2.0,
+      "bin_seeding": true
+    },
+    "agglomerative": {
+      "n_clusters": 2,
+      "affinity": "euclidean",
+      "linkage": "ward"
+    },
+    "gaussian_mixture": {
+      "n_components": 2,
+      "covariance_type": "full",
+      "max_iter": 100,
+      "tol": 0.001
+    }
+  },
+  "calinski_harabasz": {
+    "kmeans": {
+      "n_clusters": 2,
+      "init": "k-means++",
+      "n_init": "auto",
+      "max_iter": 300,
+      "tol": 0.0001
+    },
+    "dbscan": {
+      "eps": 0.5,
+      "min_samples": 5
+    },
+    "affinity_propagation": {
+      "damping": 0.5,
+      "preference": 0.0,
+      "convergence_iter": 15
+    },
+    "hdbscan": {
+      "min_cluster_size": 5,
+      "min_samples": 5
+    },
+    "meanshift": {
+      "bandwidth": 2.0,
+      "bin_seeding": true
+    },
+    "agglomerative": {
+      "n_clusters": 2,
+      "affinity": "euclidean",
+      "linkage": "ward"
+    },
+    "gaussian_mixture": {
+      "n_components": 2,
+      "covariance_type": "full",
+      "max_iter": 100,
+      "tol": 0.001
+    }
+  },
+  "composite": {
+    "kmeans": {
+      "n_clusters": 2,
+      "init": "k-means++",
+      "n_init": "auto",
+      "max_iter": 300,
+      "tol": 0.0001
+    },
+    "dbscan": {
+      "eps": 0.5,
+      "min_samples": 5
+    },
+    "affinity_propagation": {
+      "damping": 0.5,
+      "preference": 0.0,
+      "convergence_iter": 15
+    },
+    "hdbscan": {
+      "min_cluster_size": 5,
+      "min_samples": 5
+    },
+    "meanshift": {
+      "bandwidth": 2.0,
+      "bin_seeding": true
+    },
+    "agglomerative": {
+      "n_clusters": 2,
+      "affinity": "euclidean",
+      "linkage": "ward"
+    },
+    "gaussian_mixture": {
+      "n_components": 2,
+      "covariance_type": "full",
+      "max_iter": 100,
+      "tol": 0.001
     }
   }
-  
+}

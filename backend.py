@@ -85,11 +85,12 @@ def cluster_stocks():
     year = data.get('year')
     algorithm = data.get('algorithm')
     use_best_params = data.get('use_best_params', False)
-    params = cluster_params[algorithm] if use_best_params else data.get('params', {})
+    score_method = data.get('score_method', 'silhouette')  # 'silhouette', 'calinski_harabasz', or 'davies_bouldin'
+    params = cluster_params[score_method][algorithm] if use_best_params else data.get('params', {})
     reduce_method = data.get('reduce_method', 'none')  # 'pca', 'tsne', or 'none'
     n_components = data.get('n_components', 2)  # Number of components for reduction
 
-    print(params) 
+    
     # Load stock data
     stock_data = load_json(data['file_path'])
     df, X = preprocess_data(stock_data, year)
@@ -121,22 +122,12 @@ def cluster_stocks():
 
     # Perform clustering
     labels = model.fit_predict(X)
-
-    # Compute clustering scores
-    scores = {
-        "Silhouette Score": silhouette_score(X, labels) if len(set(labels)) > 1 else "N/A",
-        "Calinski-Harabasz Index": calinski_harabasz_score(X, labels) if len(set(labels)) > 1 else "N/A",
-        "Davies-Bouldin Index": davies_bouldin_score(X, labels) if len(set(labels)) > 1 else "N/A"
-    }
-
-    # Prepare response
     
 
     data_with_scores_and_clusters = {
         df.iloc[i]['stock_name']: {
             **{k: convert_to_serializable(v) for k, v in df.iloc[i].to_dict().items()},
             "cluster": int(labels[i]),
-            "scores": {k: convert_to_serializable(v) for k, v in scores.items()},
             "reduced_dimensions": X[i].tolist()  # Add reduced dimensions to the response
         } for i in range(len(df))
     }
@@ -213,4 +204,3 @@ def nearest_stocks():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-b
