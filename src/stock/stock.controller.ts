@@ -22,9 +22,9 @@ export class StockController {
     return this.stockService.findByYear(+year);
   }
 
-  @Get('search/:prefix')
+  @Get('search/:prefix?')
   @UseGuards(JwtAuthGuard)
-  searchByPrefix(@Param('prefix') prefix: string, @Query('limit') limit?: string) {
+  searchByPrefix(@Param('prefix') prefix: string = '', @Query('limit') limit?: string) {
     const limitNumber = limit ? parseInt(limit, 10) : undefined;
     return this.stockService.searchByPrefix(prefix, limitNumber);
   }

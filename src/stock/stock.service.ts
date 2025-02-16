@@ -52,7 +52,7 @@ export class StockService {
     }
   }
 
-  searchByPrefix(prefix: string, limit?: number) {
+  searchByPrefix(prefix: string = '', limit?: number) {
     const filePath = path.join(__dirname, '../../../DATASET/RawData', `2020.json`);
     if (fs.existsSync(filePath)) {
       const data = fs.readFileSync(filePath, 'utf8');
