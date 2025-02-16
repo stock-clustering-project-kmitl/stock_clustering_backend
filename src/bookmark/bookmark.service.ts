@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 import { User } from 'src/user/schema/user.schema';
 import { UserService } from 'src/user/user.service';
+import { UpdateBookmarkDto } from './dto/update-bookmark.dto';
 
 @Injectable()
 export class BookmarkService {
@@ -45,6 +46,20 @@ export class BookmarkService {
 
     await this.bookmarkModel.findByIdAndDelete(bookmarkId);
     await this.userService.removeBookmarkFromUser(user._id.toString(), bookmarkId);
+  }
+
+  async update(bookmarkId: string, updateBookmarkDto: UpdateBookmarkDto, user: User): Promise<Bookmark> {
+    const bookmark = await this.bookmarkModel.findById(bookmarkId);
+    if (!bookmark) {
+      throw new NotFoundException('Bookmark not found');
+    }
+
+    if (bookmark.userId.toString() !== user._id.toString()) {
+      throw new ForbiddenException('You do not have permission to update this bookmark');
+    }
+
+    Object.assign(bookmark, updateBookmarkDto);
+    return bookmark.save();
   }
 
   async findByUser(user: User): Promise<Bookmark[]> {
