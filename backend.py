@@ -80,7 +80,7 @@ def convert_to_serializable(value):
         return value  # Return the value as is if it's already serializable
 
 # Load cluster parameters
-cluster_params = load_json('../cluster_backend/shared/constants/cluster_parameter.json')
+cluster_params = load_json('./shared/constants/cluster_parameter.json')
 
 # Route to handle clustering requests
 @app.route('/cluster', methods=['POST'])
@@ -113,13 +113,13 @@ def cluster_stocks():
     if reduce_method != 'none':
         X, _ = reduce_dimension(X, method=reduce_method, n_components=n_components)
 
-    # Select clustering algorithm
+    random_seed = 42  # Set a random seed for reproducibility
     if algorithm == 'kmeans':
-        model = KMeans(**params)
+        model = KMeans(random_state=random_seed, **params)
     elif algorithm == 'dbscan':
         model = DBSCAN(**params)
     elif algorithm == 'affinity_propagation':
-        model = AffinityPropagation(**params)
+        model = AffinityPropagation(random_state=random_seed, **params)
     elif algorithm == 'hdbscan':
         model = HDBSCAN(**params)
     elif algorithm == 'meanshift':
@@ -127,7 +127,7 @@ def cluster_stocks():
     elif algorithm == 'agglomerative':
         model = AgglomerativeClustering(**params)
     elif algorithm == 'gaussian_mixture':
-        model = GaussianMixture(**params)
+        model = GaussianMixture(random_state=random_seed, **params)
     else:
         return jsonify({"error": "Unsupported algorithm."}), 400
 
@@ -179,12 +179,13 @@ def nearest_stocks():
         return jsonify({"error": "No data available for the selected year."}), 400
     
     # Select clustering algorithm
+    random_seed = 42  # Set a random seed for reproducibility
     if algorithm == 'kmeans':
-        model = KMeans(**params)
+        model = KMeans(random_state=random_seed, **params)
     elif algorithm == 'dbscan':
         model = DBSCAN(**params)
     elif algorithm == 'affinity_propagation':
-        model = AffinityPropagation(**params)
+        model = AffinityPropagation(random_state=random_seed, **params)
     elif algorithm == 'hdbscan':
         model = HDBSCAN(**params)
     elif algorithm == 'meanshift':
@@ -192,7 +193,7 @@ def nearest_stocks():
     elif algorithm == 'agglomerative':
         model = AgglomerativeClustering(**params)
     elif algorithm == 'gaussian_mixture':
-        model = GaussianMixture(**params)
+        model = GaussianMixture(random_state=random_seed, **params)
     else:
         return jsonify({"error": "Unsupported algorithm."}), 400
     
