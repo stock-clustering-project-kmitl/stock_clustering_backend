@@ -25,14 +25,16 @@ export class StockService {
     return `This action returns a #${id} stock`;
   }
 
-  async findBySymbol(symbol: string, userId: string) {
+  async findBySymbol(symbol: string, userId: string , favorite : boolean = false) {
     const filePath = path.join(__dirname, '../../../DATASET/RawData', `2020.json`);
     if (fs.existsSync(filePath)) {
       const data = fs.readFileSync(filePath, 'utf8');
       const stocks = JSON.parse(data);
       const stock = stocks.find((stock: any) => stock.symbol === symbol);
       if (stock) {
-        await this.userService.addStockToLastSearch(userId, symbol);
+        if(!favorite){
+          await this.userService.addStockToLastSearch(userId, symbol);
+        }
         return stock;
       } else {
         throw new NotFoundException(`Stock with symbol ${symbol} not found`);
