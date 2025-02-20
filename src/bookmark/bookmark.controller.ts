@@ -4,6 +4,7 @@ import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { User } from 'src/user/schema/user.schema';
+import { UpdateBookmarkDto } from './dto/update-bookmark.dto';
 
 @Controller('bookmark')
 export class BookmarkController {
@@ -19,6 +20,12 @@ export class BookmarkController {
   @UseGuards(JwtAuthGuard)
   async getBookmarks(@CurrentUser() user: User) {
     return this.bookmarkService.findByUser(user);
+  }
+
+  @Patch('/:id')
+  @UseGuards(JwtAuthGuard)
+  async updateBookmark(@Param('id') bookmarkId: string, @Body() updateBookmarkDto: UpdateBookmarkDto, @CurrentUser() user: User) {
+    return this.bookmarkService.update(bookmarkId, updateBookmarkDto, user);
   }
 
   @Delete('/:id')

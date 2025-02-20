@@ -8,7 +8,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(new ValidationPipe());
-  app.use(cookieParser())
+  app.use(cookieParser());
+
+  // Enable CORS
+  app.enableCors({
+    origin: 'http://localhost:5173', // Replace with your frontend URL
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Stock Clustering Api')
@@ -17,7 +23,6 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
 
   await app.listen(process.env.PORT ?? 3000);
 }

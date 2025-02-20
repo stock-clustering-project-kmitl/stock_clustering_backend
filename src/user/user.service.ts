@@ -105,7 +105,7 @@ export class UserService {
 
     const favoriteStockNames = user.favorite.slice(startIndex, endIndex);
     const favoriteStocks = await Promise.all(
-      favoriteStockNames.map(stockName => this.stockService.findBySymbol(stockName, userId))
+      favoriteStockNames.map(stockName => this.stockService.findBySymbol(stockName, userId, true))
     );
 
     favoriteStocks.sort((a, b) => {

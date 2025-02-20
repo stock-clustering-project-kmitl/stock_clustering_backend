@@ -22,10 +22,21 @@ export class StockController {
     return this.stockService.findByYear(+year);
   }
 
-  @Get('search/:prefix')
+  @Get('search/:prefix?')
   @UseGuards(JwtAuthGuard)
-  searchByPrefix(@Param('prefix') prefix: string, @Query('limit') limit?: string) {
+  searchByPrefix(@Param('prefix') prefix: string = '', @Query('limit') limit?: string) {
     const limitNumber = limit ? parseInt(limit, 10) : undefined;
     return this.stockService.searchByPrefix(prefix, limitNumber);
+  }
+
+  @Get('compare')
+  @UseGuards(JwtAuthGuard)
+  compareStocks(
+    @Query('stock1') stock1: string,
+    @Query('stock2') stock2: string,
+    @Query('year') year: string,
+    @CurrentUser() user: User
+  ) {
+    return this.stockService.compareStocks(stock1, stock2, +year);
   }
 }

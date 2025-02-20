@@ -36,7 +36,7 @@ export class ClusterService {
 
   async callGetClusterApi(data: any, user: User) {
     try {
-      const response = await axios.post('http://localhost:5000/cluster', data);
+      const response = await axios.post(`${process.env.FLASK_URL}/cluster`, data);
       if(data.params) {
         await this.userService.addClusterParameter(user._id.toString(),data.algorithm,data.params);
       }
@@ -48,7 +48,7 @@ export class ClusterService {
 
   async callGetNearestStockApi(data: any) {
     try {
-      const response = await axios.post('http://localhost:5000/nearest_stocks', data);
+      const response = await axios.post(`${process.env.FLASK_URL}/nearest_stocks`, data);
       return response.data;
     } catch (error) {
       throw new Error(`Error calling Flask API: ${error.message}`);

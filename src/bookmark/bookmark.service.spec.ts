@@ -15,4 +15,11 @@ describe('BookmarkService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('should update a bookmark', async () => {
+    const result = { /* mock updated bookmark */ };
+    jest.spyOn(service, 'update').mockImplementation(async () => result);
+
+    expect(await service.update('bookmarkId', { /* mock update DTO */ }, { /* mock user */ })).toBe(result);
+  });
 });
