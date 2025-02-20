@@ -12,7 +12,7 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors({
-    origin: ['http://example-server.com', 'http://localhost:5174'],
+    origin: ['https://stock-clustering-frontend.vercel.app', 'http://localhost:5174'],
     credentials: true,
   });
 
