@@ -72,4 +72,32 @@ export class UserController {
   async updatePassword(@CurrentUser() user: User, @Body() updateUserPasswordDto: UpdateUserPasswordDto) {
     return this.userService.updateUserPassword(user._id.toString(), updateUserPasswordDto);
   }
+
+  @Get('/last-stock-search')
+  @UseGuards(JwtAuthGuard)
+  async getLastStockSearch(@CurrentUser() user: User) {
+    return this.userService.getLastStockSearch(user._id.toString());
+  }
+
+  @Delete('/last-stock-search')
+  @UseGuards(JwtAuthGuard)
+  async deleteLastStockSearch(@CurrentUser() user: User, @Body('stockName') stockName: string) {
+    return this.userService.deleteStockFromLastSearch(user._id.toString(), stockName);
+  }
+
+  @Get('/last-cluster-param')
+  @UseGuards(JwtAuthGuard)
+  async getLastClusterParam(@CurrentUser() user: User, @Query('algorithm') algorithm: string) {
+    return this.userService.getLastClusterParameter(user._id.toString(), algorithm);
+  }
+
+  @Delete('/last-cluster-param')
+  @UseGuards(JwtAuthGuard)
+  async deleteLastClusterParam(
+    @CurrentUser() user: User, 
+    @Body('algorithm') algorithm: string, 
+    @Body('parameterIndex') parameterIndex: number
+  ) {
+    return this.userService.deleteLastClusterParameter(user._id.toString(), algorithm, parameterIndex);
+  }
 }

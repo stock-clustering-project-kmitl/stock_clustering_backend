@@ -23,7 +23,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async checkAuth(@CurrentUser() user: User) {
-    return { email: "user.email", username: user.username };
+    return { email: user.email, username: user.username };
   }
 
   @Post('logout')
