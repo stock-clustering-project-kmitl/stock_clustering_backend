@@ -25,27 +25,30 @@ export class StockService {
     return `This action returns a #${id} stock`;
   }
 
-  async findBySymbol(symbol: string, userId: string , favorite : boolean = false) {
-    const filePath = path.join(__dirname, '../../../DATASET/RawData', `2020.json`);
+  async findBySymbol(symbol: string, userId: string, year: string, hasNull: boolean,  favorite: boolean = false, ) {
+    console.log(year)
+    const directory = hasNull ? 'RawData' : 'RawDataNoNull';
+    const filePath = path.join(__dirname, `../../../DATASET/${directory}`, `${year}.json`);
     if (fs.existsSync(filePath)) {
-      const data = fs.readFileSync(filePath, 'utf8');
-      const stocks = JSON.parse(data);
-      const stock = stocks.find((stock: any) => stock.symbol === symbol);
-      if (stock) {
-        if(!favorite){
-          await this.userService.addStockToLastSearch(userId, symbol);
+        const data = fs.readFileSync(filePath, 'utf8');
+        const stocks = JSON.parse(data);
+        const stock = stocks.find((stock: any) => stock.symbol === symbol);
+        if (stock) {
+            if (!favorite) {
+                await this.userService.addStockToLastSearch(userId, symbol);
+            }
+            return stock;
+        } else {
+            throw new NotFoundException(`Stock with symbol ${symbol} not found`);
         }
-        return stock;
-      } else {
-        throw new NotFoundException(`Stock with symbol ${symbol} not found`);
-      }
     } else {
-      throw new NotFoundException(`Stock data not found`);
+        throw new NotFoundException(`Stock data not found`);
     }
-  }
+}
 
-  findByYear(year: number) {
-    const filePath = path.join(__dirname, '../../../DATASET/RawData', `${year}.json`);
+  findByYear(year: number, hasNull: boolean) {
+    const directory = hasNull ? 'RawData' : 'RawDataNoNull';
+    const filePath = path.join(__dirname, `../../../DATASET/${directory}`, `${year}.json`);
     if (fs.existsSync(filePath)) {
       const data = fs.readFileSync(filePath, 'utf8');
       return JSON.parse(data);
@@ -55,8 +58,9 @@ export class StockService {
   }
 
   // Added method to compare two stocks for a given year
-  async compareStocks(stock1: string, stock2: string, year: number) {
-    const filePath = path.join(__dirname, '../../../DATASET/RawData', `${year}.json`);
+  async compareStocks(stock1: string, stock2: string, year: string , hasNull: boolean = false) {
+    const directory = hasNull ? 'RawData' : 'RawDataNoNull';
+    const filePath = path.join(__dirname, `../../../DATASET/${directory}`, `${year}.json`);
     if (!fs.existsSync(filePath)) {
       throw new NotFoundException(`Data for year ${year} not found`);
     }
@@ -70,8 +74,9 @@ export class StockService {
     return { stock1: stockData1, stock2: stockData2 };
   }
 
-  searchByPrefix(prefix: string = '', limit?: number) {
-    const filePath = path.join(__dirname, '../../../DATASET/RawData', `2020.json`);
+  searchByPrefix( prefix: string = '', year: number,  hasNull: boolean = false, limit?: number) {
+    const directory = hasNull ? 'RawData' : 'RawDataNoNull';
+    const filePath = path.join(__dirname, `../../../DATASET/${directory}`, `${year}.json`);
     if (fs.existsSync(filePath)) {
       const data = fs.readFileSync(filePath, 'utf8');
       const stocks = JSON.parse(data);
