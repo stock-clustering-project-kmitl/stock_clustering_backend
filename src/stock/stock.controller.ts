@@ -28,4 +28,15 @@ export class StockController {
     const limitNumber = limit ? parseInt(limit, 10) : undefined;
     return this.stockService.searchByPrefix(prefix, limitNumber);
   }
+
+  @Get('compare')
+  @UseGuards(JwtAuthGuard)
+  compareStocks(
+    @Query('stock1') stock1: string,
+    @Query('stock2') stock2: string,
+    @Query('year') year: string,
+    @CurrentUser() user: User
+  ) {
+    return this.stockService.compareStocks(stock1, stock2, +year);
+  }
 }

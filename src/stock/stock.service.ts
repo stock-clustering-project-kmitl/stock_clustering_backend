@@ -54,6 +54,22 @@ export class StockService {
     }
   }
 
+  // Added method to compare two stocks for a given year
+  async compareStocks(stock1: string, stock2: string, year: number) {
+    const filePath = path.join(__dirname, '../../../DATASET/RawData', `${year}.json`);
+    if (!fs.existsSync(filePath)) {
+      throw new NotFoundException(`Data for year ${year} not found`);
+    }
+    const data = fs.readFileSync(filePath, 'utf8');
+    const stocks = JSON.parse(data);
+    const stockData1 = stocks.find((s: any) => s.symbol === stock1);
+    const stockData2 = stocks.find((s: any) => s.symbol === stock2);
+    if (!stockData1 || !stockData2) {
+      throw new NotFoundException(`One or both stocks not found`);
+    }
+    return { stock1: stockData1, stock2: stockData2 };
+  }
+
   searchByPrefix(prefix: string = '', limit?: number) {
     const filePath = path.join(__dirname, '../../../DATASET/RawData', `2020.json`);
     if (fs.existsSync(filePath)) {
