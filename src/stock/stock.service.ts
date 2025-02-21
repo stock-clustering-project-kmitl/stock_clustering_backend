@@ -58,7 +58,7 @@ export class StockService {
   }
 
   // Added method to compare two stocks for a given year
-  async compareStocks(stock1: string, stock2: string, year: string , hasNull: boolean = false) {
+  async compareStocks(stock1: string, stock2: string, year: number , hasNull: boolean = false) {
     const directory = hasNull ? 'RawData' : 'RawDataNoNull';
     const filePath = path.join(__dirname, `../../../DATASET/${directory}`, `${year}.json`);
     if (!fs.existsSync(filePath)) {
@@ -74,7 +74,7 @@ export class StockService {
     return { stock1: stockData1, stock2: stockData2 };
   }
 
-  searchByPrefix( prefix: string = '', year: number,  hasNull: boolean = false, limit?: number) {
+  searchByPrefix( prefix: string = '', year: string,  hasNull: boolean = false, limit?: number) {
     const directory = hasNull ? 'RawData' : 'RawDataNoNull';
     const filePath = path.join(__dirname, `../../../DATASET/${directory}`, `${year}.json`);
     if (fs.existsSync(filePath)) {
