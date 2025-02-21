@@ -105,7 +105,7 @@ export class UserService {
 
     const favoriteStockNames = user.favorite.slice(startIndex, endIndex);
     const favoriteStocks = await Promise.all(
-      favoriteStockNames.map(stockName => this.stockService.findBySymbol(stockName, userId, true))
+      favoriteStockNames.map(stockName => this.stockService.findBySymbol(stockName, userId,"2020", false))
     );
 
     favoriteStocks.sort((a, b) => {
@@ -216,5 +216,43 @@ export class UserService {
 
     await user.save();
     return user.lastClusterParameterUsed;
+  }
+
+  async getLastStockSearch(userId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    return user.lastStockSearch;
+  }
+  
+  async deleteStockFromLastSearch(userId: string, stockName: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    user.lastStockSearch = user.lastStockSearch.filter(stock => stock !== stockName);
+    await user.save();
+    return user.lastStockSearch;
+  }
+  
+  async getLastClusterParameter(userId: string, algorithm: string) {
+    console.log(algorithm)
+    const user = await this.userModel.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    console.log(user.lastClusterParameterUsed)
+    return user.lastClusterParameterUsed?.get(algorithm) || [];
+  }
+  
+  async deleteLastClusterParameter(userId: string, algorithm: string, parameterIndex: number) {
+    const user = await this.userModel.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    if (!user.lastClusterParameterUsed || !user.lastClusterParameterUsed.has(algorithm)) {
+      throw new NotFoundException('Algorithm parameters not found');
+    }
+    const parameters = user.lastClusterParameterUsed.get(algorithm);
+    if (parameterIndex < 0 || parameterIndex >= parameters.length) {
+      throw new NotFoundException('Parameter not found');
+    }
+    parameters.splice(parameterIndex, 1);
+    user.lastClusterParameterUsed.set(algorithm, parameters);
+    await user.save();
+    return user.lastClusterParameterUsed.get(algorithm);
   }
 }

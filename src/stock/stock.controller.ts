@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query ,UseGuards} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, ParseBoolPipe } from '@nestjs/common';
 import { StockService } from './stock.service';
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
@@ -12,21 +12,34 @@ export class StockController {
 
   @Get('name/:name')
   @UseGuards(JwtAuthGuard)
-  findBySymbol(@Param('name') name: string, @CurrentUser() user: User) {
-    return this.stockService.findBySymbol(name, user._id.toString());
+  findBySymbol(
+    @Param('name') name: string,
+    @Query('year') year: string,
+    @Query('hasNull', ParseBoolPipe) hasNull: boolean,
+    @CurrentUser() user: User
+  ) {
+    return this.stockService.findBySymbol(name, user._id.toString(), year, hasNull);
   }
 
   @Get('year/:year')
   @UseGuards(JwtAuthGuard)
-  findByYear(@Param('year') year: string) {
-    return this.stockService.findByYear(+year);
+  findByYear(
+    @Param('year') year: string,
+    @Query('hasNull', ParseBoolPipe) hasNull: boolean
+  ) {
+    return this.stockService.findByYear(+year, hasNull);
   }
 
   @Get('search/:prefix?')
   @UseGuards(JwtAuthGuard)
-  searchByPrefix(@Param('prefix') prefix: string = '', @Query('limit') limit?: string) {
+  searchByPrefix(
+    @Param('prefix') prefix: string = '',
+    @Query('year') year: string,
+    @Query('hasNull', ParseBoolPipe) hasNull: boolean,
+    @Query('limit') limit?: string
+  ) {
     const limitNumber = limit ? parseInt(limit, 10) : undefined;
-    return this.stockService.searchByPrefix(prefix, limitNumber);
+    return this.stockService.searchByPrefix(prefix, year, hasNull, limitNumber);
   }
 
   @Get('compare')
@@ -35,8 +48,9 @@ export class StockController {
     @Query('stock1') stock1: string,
     @Query('stock2') stock2: string,
     @Query('year') year: string,
+    @Query('hasNull', ParseBoolPipe) hasNull: boolean,
     @CurrentUser() user: User
   ) {
-    return this.stockService.compareStocks(stock1, stock2, +year);
+    return this.stockService.compareStocks(stock1, stock2, +year, hasNull);
   }
 }
