@@ -88,12 +88,15 @@ def cluster_stocks():
     data = request.json
     year = data.get('year')
     algorithm = data.get('algorithm')
+    hasNull = data['file_path'].split('/')[2]
     use_best_params = data.get('use_best_params', False)
     score_method = data.get('score_method', 'silhouette')  # 'silhouette', 'calinski_harabasz', or 'davies_bouldin'
-    params = cluster_params[score_method][algorithm] if use_best_params else data.get('params', {})
+    params = cluster_params[algorithm][year][hasNull][score_method]if use_best_params else data.get('params', {})
     reduce_method = data.get('reduce_method', 'none')  # 'pca', 'tsne', or 'none'
     n_components = data.get('n_components', 2)  # Number of components for reduction
     stock_symbols = data.get('stock_symbols', [])  # List of stock symbols to cluster
+
+    print(params)
 
     # Load stock data
     stock_data = load_json(data['file_path'])
@@ -143,23 +146,12 @@ def cluster_stocks():
     }
 
     response = {
-        "data": data_with_scores_and_clusters
+        "data": data_with_scores_and_clusters,
+        "params": params,
     }
     return jsonify(response)
     
 
-    data_with_scores_and_clusters = {
-        df.iloc[i]['stock_name']: {
-            **{k: convert_to_serializable(v) for k, v in df.iloc[i].to_dict().items()},
-            "cluster": int(labels[i]),
-            "reduced_dimensions": X[i].tolist()  # Add reduced dimensions to the response
-        } for i in range(len(df))
-    }
-
-    response = {
-        "data": data_with_scores_and_clusters
-    }
-    return jsonify(response)
 
 @app.route('/nearest_stocks', methods=['POST'])
 def nearest_stocks():
@@ -167,8 +159,10 @@ def nearest_stocks():
     stock_name = data.get('stock_name')
     year = data.get('year')
     algorithm = data.get('algorithm')
+    hasNull = data['file_path'].split('/')[2]
+    score_method = data.get('score_method', 'composite'),
     use_best_params = data.get('use_best_params', False)
-    params = cluster_params[algorithm] if use_best_params else data.get('params', {})
+    params = cluster_params[algorithm][year][hasNull][score_method] if use_best_params else data.get('params', {})
     number_of_stock = data.get('number_of_stock', 1)  # Number of nearest stocks to return
     
     # Load stock data
