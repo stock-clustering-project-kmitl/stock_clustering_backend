@@ -10,6 +10,7 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 from scipy.spatial.distance import euclidean
+from werkzeug.exceptions import HTTPException  # NEW: Import HTTPException
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS
@@ -78,8 +79,15 @@ def convert_to_serializable(value):
         if isinstance(value, np.ndarray):
             return value.tolist()  # Convert NumPy arrays to lists
         return value  # Return the value as is if it's already serializable
+def error_response(message, code=400):
+    return jsonify({"status": "error", "message": message}), code
 
-# Load cluster parameters
+@app.errorhandler(Exception)
+def handle_exception(e):
+    if isinstance(e, HTTPException):
+        return error_response(e.description, e.code)
+    return error_response("Internal server error: " + str(e), 500)
+
 cluster_params = load_json('./shared/constants/cluster_parameter.json')
 
 # Route to handle clustering requests
@@ -103,13 +111,13 @@ def cluster_stocks():
     df, X = preprocess_data(stock_data, year)
 
     if X.size == 0:
-        return jsonify({"error": "No data available for the selected year."}), 400
+        return error_response("No data available for the selected year.")
 
     # Filter data based on provided stock symbols
     if stock_symbols:
         df = df[df['stock_name'].isin(stock_symbols)]
         if df.empty:
-            return jsonify({"error": "No data available for the provided stock symbols."}), 400
+            return error_response("No data available for the provided stock symbols.")
         X = df.drop(columns=['stock_name']).apply(pd.to_numeric, errors='coerce').fillna(0).values
 
     # Reduce dimensionality if needed
@@ -117,24 +125,26 @@ def cluster_stocks():
         X, _ = reduce_dimension(X, method=reduce_method, n_components=n_components)
 
     random_seed = 42  # Set a random seed for reproducibility
-    if algorithm == 'kmeans':
-        model = KMeans(random_state=random_seed, **params)
-    elif algorithm == 'dbscan':
-        model = DBSCAN(**params)
-    elif algorithm == 'affinity_propagation':
-        model = AffinityPropagation(random_state=random_seed, **params)
-    elif algorithm == 'hdbscan':
-        model = HDBSCAN(**params)
-    elif algorithm == 'meanshift':
-        model = MeanShift(**params)
-    elif algorithm == 'agglomerative':
-        model = AgglomerativeClustering(**params)
-    elif algorithm == 'gaussian_mixture':
-        model = GaussianMixture(random_state=random_seed, **params)
-    else:
-        return jsonify({"error": "Unsupported algorithm."}), 400
+    try:
+        if algorithm == 'kmeans':
+            model = KMeans(random_state=random_seed, **params)
+        elif algorithm == 'dbscan':
+            model = DBSCAN(**params)
+        elif algorithm == 'affinity_propagation':
+            model = AffinityPropagation(random_state=random_seed, **params)
+        elif algorithm == 'hdbscan':
+            model = HDBSCAN(**params)
+        elif algorithm == 'meanshift':
+            model = MeanShift(**params)
+        elif algorithm == 'agglomerative':
+            model = AgglomerativeClustering(**params)
+        elif algorithm == 'gaussian_mixture':
+            model = GaussianMixture(random_state=random_seed, **params)
+        else:
+            return error_response("Unsupported algorithm.")
+    except TypeError as e:
+        return error_response(f"Parameter type error: {e}")
 
-    # Perform clustering
     labels = model.fit_predict(X)
 
     data_with_scores_and_clusters = {
@@ -144,7 +154,7 @@ def cluster_stocks():
             "reduced_dimensions": X[i].tolist()  # Add reduced dimensions to the response
         } for i in range(len(df))
     }
-
+    
     response = {
         "data": data_with_scores_and_clusters,
         "params": params,
@@ -155,71 +165,78 @@ def cluster_stocks():
 
 @app.route('/nearest_stocks', methods=['POST'])
 def nearest_stocks():
-    data = request.json
-    stock_name = data.get('stock_name')
-    year = data.get('year')
-    algorithm = data.get('algorithm')
-    hasNull = data['file_path'].split('/')[2]
-    score_method = data.get('score_method', 'composite'),
-    use_best_params = data.get('use_best_params', False)
-    params = cluster_params[algorithm][year][hasNull][score_method] if use_best_params else data.get('params', {})
-    number_of_stock = data.get('number_of_stock', 1)  # Number of nearest stocks to return
+    try:
+        data = request.json
+        stock_name = data.get('stock_name')
+        year = data.get('year')
+        algorithm = data.get('algorithm')
+        hasNull = data['file_path'].split('/')[2]
+        score_method = data.get('score_method', 'composite')
+        use_best_params = data.get('use_best_params', False)
+        params = cluster_params[algorithm][year][hasNull][score_method] if use_best_params else data.get('params', {})
+        number_of_stock = data.get('number_of_stock', 1)  # Number of nearest stocks to return
+
+        # Load stock data
+        stock_data = load_json(data['file_path'])
+        df, X = preprocess_data(stock_data, year)
+        if X.size == 0:
+            return error_response("No data available for the selected year.")
+        
+        reduce_method = data.get('reduce_method', 'none')
+        n_components = data.get('n_components', 2)
+        if reduce_method != 'none':
+            X, _ = reduce_dimension(X, method=reduce_method, n_components=n_components)
+        
+        random_seed = 42  # Set a random seed for reproducibility
+        try:
+            # ...existing clustering setup code...
+            if algorithm == 'kmeans':
+                model = KMeans(random_state=random_seed, **params)
+            elif algorithm == 'dbscan':
+                model = DBSCAN(**params)
+            elif algorithm == 'affinity_propagation':
+                model = AffinityPropagation(random_state=random_seed, **params)
+            elif algorithm == 'hdbscan':
+                model = HDBSCAN(**params)
+            elif algorithm == 'meanshift':
+                model = MeanShift(**params)
+            elif algorithm == 'agglomerative':
+                model = AgglomerativeClustering(**params)
+            elif algorithm == 'gaussian_mixture':
+                model = GaussianMixture(random_state=random_seed, **params)
+            else:
+                return error_response("Unsupported algorithm.")
+        except TypeError as e:
+            return error_response(f"Parameter error: {e}")
+        
+        labels = model.fit_predict(X)
+
+        target_index = df[df['stock_name'] == stock_name].index
+        if target_index.empty:
+            return error_response("Stock not found.")
+
+        target_index = target_index[0]
+        target_cluster = labels[target_index]
+        same_cluster_indices = [i for i, label in enumerate(labels) if label == target_cluster and i != target_index]
+        if not same_cluster_indices:
+            return error_response("No other stocks in the same cluster.")
+
+        target_vector = X[target_index]
+        nearest_indices = sorted(same_cluster_indices, key=lambda i: euclidean(target_vector, X[i]))[:number_of_stock]
+        nearest_stocks = [{
+            "stock_name": df.iloc[i]['stock_name'],
+            "distance": euclidean(target_vector, X[i]),
+            "cluster": int(labels[i])
+        } for i in nearest_indices]
+
+        response = {
+            "nearest_stocks": nearest_stocks,
+            "target_cluster": int(target_cluster)
+        }
+        return jsonify(response)
+    except Exception as err:
+        return error_response(str(err), 500)
     
-    # Load stock data
-    stock_data = load_json(data['file_path'])
-    df, X = preprocess_data(stock_data, year)
-    
-    if X.size == 0:
-        return jsonify({"error": "No data available for the selected year."}), 400
-    
-    # Select clustering algorithm
-    random_seed = 42  # Set a random seed for reproducibility
-    if algorithm == 'kmeans':
-        model = KMeans(random_state=random_seed, **params)
-    elif algorithm == 'dbscan':
-        model = DBSCAN(**params)
-    elif algorithm == 'affinity_propagation':
-        model = AffinityPropagation(random_state=random_seed, **params)
-    elif algorithm == 'hdbscan':
-        model = HDBSCAN(**params)
-    elif algorithm == 'meanshift':
-        model = MeanShift(**params)
-    elif algorithm == 'agglomerative':
-        model = AgglomerativeClustering(**params)
-    elif algorithm == 'gaussian_mixture':
-        model = GaussianMixture(random_state=random_seed, **params)
-    else:
-        return jsonify({"error": "Unsupported algorithm."}), 400
-    
-    # Perform clustering
-    labels = model.fit_predict(X)
-    
-    # Find the target stock's cluster
-    target_index = df[df['stock_name'] == stock_name].index
-    if target_index.empty:
-        return jsonify({"error": "Stock not found."}), 400
-    
-    target_index = target_index[0]
-    target_cluster = labels[target_index]
-    
-    # Find the nearest stocks within the same cluster
-    same_cluster_indices = [i for i, label in enumerate(labels) if label == target_cluster and i != target_index]
-    if not same_cluster_indices:
-        return jsonify({"error": "No other stocks in the same cluster."}), 400
-    
-    target_vector = X[target_index]
-    nearest_indices = sorted(same_cluster_indices, key=lambda i: euclidean(target_vector, X[i]))[:number_of_stock]
-    nearest_stocks = [{
-        "stock_name": df.iloc[i]['stock_name'],
-        "distance": euclidean(target_vector, X[i]),
-        "cluster": int(labels[i])
-    } for i in nearest_indices]
-    
-    response = {
-        "nearest_stocks": nearest_stocks,
-        "target_cluster": int(target_cluster)
-    }
-    return jsonify(response)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
