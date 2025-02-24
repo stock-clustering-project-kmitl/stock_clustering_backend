@@ -1,4 +1,4 @@
-import { Injectable ,Inject,forwardRef} from '@nestjs/common';
+import { Injectable, Inject, forwardRef, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateClusterDto } from './dto/create-cluster.dto';
 import { UpdateClusterDto } from './dto/update-cluster.dto';
 import axios from 'axios';
@@ -37,21 +37,35 @@ export class ClusterService {
   async callGetClusterApi(data: any, user: User) {
     try {
       const response = await axios.post(`${process.env.FLASK_URL}/cluster`, data);
-      if(data.params) {
-        await this.userService.addClusterParameter(user._id.toString(),data.algorithm,data.params);
+      if (data.params) {
+        await this.userService.addClusterParameter(user._id.toString(), data.algorithm, data.params);
       }
+      // Changed: Always return the full JSON response
       return response.data;
     } catch (error) {
-      throw new Error(`Error calling Flask API: ${error.message}`);
+      if (axios.isAxiosError(error) && error.response) {
+        throw new HttpException(
+          error.response.data || { message: error.message },
+          error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+      throw new HttpException({ message: error.message }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   async callGetNearestStockApi(data: any) {
     try {
       const response = await axios.post(`${process.env.FLASK_URL}/nearest_stocks`, data);
+      // Changed: Always return the full JSON response
       return response.data;
     } catch (error) {
-      throw new Error(`Error calling Flask API: ${error.message}`);
+      if (axios.isAxiosError(error) && error.response) {
+        throw new HttpException(
+          error.response.data || { message: error.message },
+          error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+      throw new HttpException({ message: error.message }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
