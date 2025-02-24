@@ -45,19 +45,18 @@ export class AuthService {
     })
   }
 
-  async verifyUser(email:string ,  password:string){
+  async verifyUser(email: string, password: string) {
     try {
-
       const user = await this.userService.getUser({
         email,
       });
-      const authenticated = await compare(password, user.password)
-      if(!authenticated){
-        throw new UnauthorizedException();
+      const authenticated = await compare(password, user.password);
+      if (!authenticated) {
+        throw new UnauthorizedException('Invalid credentials provided.');
       }
       return user;
     } catch (error) {
-      throw new UnauthorizedException('error 123')
+      throw new UnauthorizedException('Invalid credentials provided.');
     }
   }
 }
