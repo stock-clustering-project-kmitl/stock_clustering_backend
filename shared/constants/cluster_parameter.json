@@ -1313,44 +1313,44 @@
         "sillhouette": {
           "n_clusters": 2,
           "linkage": "complete",
-          "affinity": "manhattan"
+          "metric": "manhattan"
         },
         "clinki": {
           "n_clusters": 1,
           "linkage": "single",
-          "affinity": "manhattan"
+          "metric": "manhattan"
         },
         "davi": {
           "n_clusters": 2,
           "linkage": "complete",
-          "affinity": "manhattan"
+          "metric": "manhattan"
         },
         "composite": {
           "n_clusters": 2,
           "linkage": "complete",
-          "affinity": "manhattan"
+          "metric": "manhattan"
         }
       },
       "NoNull": {
         "sillhouette": {
           "n_clusters": 2,
           "linkage": "complete",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "clinki": {
           "n_clusters": 17,
           "linkage": "average",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "davi": {
           "n_clusters": 2,
           "linkage": "complete",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "composite": {
           "n_clusters": 2,
           "linkage": "complete",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         }
       }
     },
@@ -1359,44 +1359,44 @@
         "sillhouette": {
           "n_clusters": 6,
           "linkage": "single",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "clinki": {
           "n_clusters": 5,
           "linkage": "average",
-          "affinity": "manhattan"
+          "metric": "manhattan"
         },
         "davi": {
           "n_clusters": 6,
           "linkage": "single",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "composite": {
           "n_clusters": 6,
           "linkage": "single",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         }
       },
       "NoNull": {
         "sillhouette": {
           "n_clusters": 12,
           "linkage": "single",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "clinki": {
           "n_clusters": 2,
           "linkage": "average",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "davi": {
           "n_clusters": 12,
           "linkage": "single",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "composite": {
           "n_clusters": 12,
           "linkage": "single",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         }
       }
     },
@@ -1405,44 +1405,44 @@
         "sillhouette": {
           "n_clusters": 2,
           "linkage": "single",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "clinki": {
           "n_clusters": 5,
           "linkage": "average",
-          "affinity": "cosine"
+          "metric": "cosine"
         },
         "davi": {
           "n_clusters": 2,
           "linkage": "single",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "composite": {
           "n_clusters": 2,
           "linkage": "single",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         }
       },
       "NoNull": {
         "sillhouette": {
           "n_clusters": 2,
           "linkage": "complete",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "clinki": {
           "n_clusters": 2,
           "linkage": "average",
-          "affinity": "cosine"
+          "metric": "cosine"
         },
         "davi": {
           "n_clusters": 2,
           "linkage": "complete",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "composite": {
           "n_clusters": 2,
           "linkage": "complete",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         }
       }
     },
@@ -1451,44 +1451,44 @@
         "sillhouette": {
           "n_clusters": 2,
           "linkage": "average",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "clinki": {
           "n_clusters": 17,
           "linkage": "complete",
-          "affinity": "manhattan"
+          "metric": "manhattan"
         },
         "davi": {
           "n_clusters": 2,
           "linkage": "average",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         },
         "composite": {
           "n_clusters": 2,
           "linkage": "average",
-          "affinity": "euclidean"
+          "metric": "euclidean"
         }
       },
       "NoNull": {
         "sillhouette": {
           "n_clusters": 2,
           "linkage": "average",
-          "affinity": "manhattan"
+          "metric": "manhattan"
         },
         "clinki": {
           "n_clusters": 2,
           "linkage": "average",
-          "affinity": "manhattan"
+          "metric": "manhattan"
         },
         "davi": {
           "n_clusters": 2,
           "linkage": "average",
-          "affinity": "manhattan"
+          "metric": "manhattan"
         },
         "composite": {
           "n_clusters": 2,
           "linkage": "average",
-          "affinity": "manhattan"
+          "metric": "manhattan"
         }
       }
     }

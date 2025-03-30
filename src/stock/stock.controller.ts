@@ -16,9 +16,10 @@ export class StockController {
     @Param('name') name: string,
     @Query('year') year: string,
     @Query('hasNull', ParseBoolPipe) hasNull: boolean,
+    @Query('favorite', ParseBoolPipe) favorite: boolean,
     @CurrentUser() user: User
   ) {
-    return this.stockService.findBySymbol(name, user._id.toString(), year, hasNull);
+    return this.stockService.findBySymbol(name, user._id.toString(), year, hasNull, favorite);
   }
 
   @Get('year/:year')

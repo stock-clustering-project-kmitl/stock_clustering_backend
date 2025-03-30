@@ -25,8 +25,7 @@ export class StockService {
     return `This action returns a #${id} stock`;
   }
 
-  async findBySymbol(symbol: string, userId: string, year: string, hasNull: boolean,  favorite: boolean = false, ) {
-    console.log(year)
+  async findBySymbol(symbol: string, userId: string, year: string, hasNull: boolean,  favorite: boolean = false ) {
     const directory = hasNull ? 'RawData' : 'RawDataNoNull';
     const filePath = path.join(__dirname, `../../../DATASET/${directory}`, `${year}.json`);
     if (fs.existsSync(filePath)) {
@@ -59,7 +58,7 @@ export class StockService {
 
   // Added method to compare two stocks for a given year
   async compareStocks(stock1: string, stock2: string, year: number , hasNull: boolean = false) {
-    const directory = hasNull ? 'RawData' : 'RawDataNoNull';
+    const directory = hasNull ? 'HasNull' : 'NoNull';
     const filePath = path.join(__dirname, `../../../DATASET/${directory}`, `${year}.json`);
     if (!fs.existsSync(filePath)) {
       throw new NotFoundException(`Data for year ${year} not found`);
